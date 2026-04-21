@@ -1,0 +1,6 @@
+WorkspaceOptimizer/node_modules/
+WorkspaceOptimizer/dist/
+WorkspaceOptimizer/.env
+WorkspaceOptimizer/*.local
+.claude/
+.superpowers/
