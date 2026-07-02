@@ -23,36 +23,54 @@ The editor lets you create and maintain these templates visually, without touchi
 Open the app at the link above. On first load it automatically opens the built-in `Windows.xml` default template so you can explore a real example right away.
 
 To start from scratch, click **New from Default** in the toolbar — this resets to the default template.
-To open your own file, click **Open…** and select a `.xml` template from your computer.
+To open your own file, click **Open Template** and select a `.xml` template from your computer.
 
 ---
 
 ## Interface overview
 
+The app uses a **Command Center** layout: a horizontal **toolbar** across the top
+holds the brand and every global action, below it on the left is the **item list
+(explorer)**, and the rest of the window is the focused **item editor**.
+
 ```
-┌──────────────────────────────────────────────────────────┐
-│  Toolbar                                                 │
-├──────────────┬───────────────────────────────────────────┤
-│              │                                           │
-│  Sidebar     │  Item editor                              │
-│  (item list) │                                           │
-│              │                                           │
-└──────────────┴───────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│ Toolbar: logo · brand │ actions… │ filename · ● Modified · ☾ │
+├──────────────┬──────────────────────────────────────────────┤
+│              │                                               │
+│  Item list   │  Item editor                                  │
+│  (explorer)  │  (General + Payload | OS Mapping)             │
+│              │                                               │
+│              ├──────────────────────────────────────────────┤
+│              │  Validation bar                               │
+│              │                                               │
+└──────────────┴──────────────────────────────────────────────┘
 ```
 
-### Toolbar buttons
+> This Command Center layout is the **default look with no configuration**. A fork can
+> restyle the brand (name, logo, accent color) on top of it via repository Variables —
+> see [White-labeling for forks](#white-labeling-for-forks). Branding overrides the
+> appearance; the layout stays the same.
+
+### Toolbar actions
+
+The horizontal toolbar holds the brand on the left and every global action as a
+labeled button; the current filename, a **Modified** indicator, and the theme toggle
+sit on the right.
 
 | Button               | Action                                                                               |
 | -------------------- | ------------------------------------------------------------------------------------ |
 | **New from Default** | Reset to the built-in default template                                               |
 | **Open Template**    | Load a `.xml` template file from disk, edit your own template                        |
 | **Download XML**     | Save the current template as an XML file (disabled when there are validation errors) |
-| **Download Script**  | Save the latest powershell script, to apply the optimization                         |
+| **Download Script**  | Save the latest PowerShell script, to apply the optimization                         |
 | **Manage OS**        | Add, edit, or remove OS definitions                                                  |
 | **PDF Report**       | Export a formatted PDF overview of all items                                         |
+| **About**            | Open the About dialog (versions, credits)                                            |
 | **☾ / ☀**           | Toggle dark/light theme (remembers your preference)                                  |
 
-The toolbar also shows the current filename and a yellow **Modified** indicator when there are unsaved changes.
+The right side of the toolbar shows the current filename and a yellow **Modified**
+indicator when there are unsaved changes.
 
 ### Sidebar
 
@@ -135,7 +153,7 @@ Performs a file or folder operation.
 | Field     | Description                      |
 | --------- | -------------------------------- |
 | Path      | Full path to the file or folder  |
-| Action    | `Delete`, `Rename`, `Remove`     |
+| Action    | `Remove`, `Rename`               |
 | Item Type | `File` or `Folder`               |
 | New Name  | Required when Action is `Rename` |
 
@@ -145,15 +163,20 @@ Performs a file or folder operation.
 
 Each item has an OS mapping that controls on which operating systems the action runs and in what context.
 
-The OS Mapping table shows a row per configured OS. Three checkboxes per OS control the behavior:
+The OS Mapping card lists every OS the template supports, grouped into **Client OS**
+and **Server OS**. Each OS row has a leading checkbox (next to the OS name) plus three
+behavior checkboxes:
 
-| Column       | Meaning                                          |
-| ------------ | ------------------------------------------------ |
-| **Execute**  | Whether the action is executed at all on this OS |
-| **Physical** | Applies when running on physical hardware        |
-| **Virtual**  | Applies when running in a virtual machine        |
+| Column        | Meaning                                                              |
+| ------------- | ------------------------------------------------------------------- |
+| *(OS name)*   | Include this OS in the item's mapping (unchecked = action does not apply) |
+| **Execute**   | Whether the action is executed at all on this OS                    |
+| **Physical**  | Applies when running on physical hardware                           |
+| **Virtual**   | Applies when running in a virtual machine                           |
 
-An OS that is not listed in an item's mapping means the action does not apply to that OS. You can add or remove OS entries per item using the `+` / `−` controls in the mapping table.
+An OS whose leading checkbox is unchecked is not part of the item's mapping, so the
+action does not apply to it. The set of available operating systems is managed globally
+via **Manage OS** in the toolbar.
 
 > **Rule:** if both Physical and Virtual are unchecked, Execute is automatically forced off.
 
@@ -179,7 +202,7 @@ Deleting an OS that is referenced by items will show a confirmation prompt.
 
 ## Validation
 
-The toolbar's **Download XML** button is disabled when the document has errors. A validation bar at the bottom of the editor shows all current errors and warnings with their location.
+The toolbar's **Download XML** action is disabled when the document has errors. A validation bar at the bottom of the editor shows all current errors and warnings with their location.
 
 Common validation rules:
 
@@ -242,3 +265,111 @@ npm run test     # run unit tests
 Built with [Vue 3](https://vuejs.org/), [Vite](https://vitejs.dev/), and [TypeScript](https://www.typescriptlang.org/). No external UI framework.
 
 Deployed automatically to GitHub Pages on every push to `main` via `.github/workflows/deploy.yml`.
+
+---
+
+## White-labeling for forks
+
+The app ships with the **Command Center** layout and the default Workspace Optimizer
+branding (name, logo, cyan accent). If you fork this repository to build and host the
+app for your own company, you can **override that default branding without changing any
+code** — the layout is unchanged, only the brand identity is replaced. Branding is
+driven entirely by GitHub Actions **repository Variables** (these are inherited by your
+fork and are not secret).
+
+### How to set it up
+
+1. In your fork: **Settings → Secrets and variables → Actions → Variables → New repository variable**.
+2. Add any of the variables below (all optional — unset ones keep the defaults).
+3. Push to `main` (or run the workflow manually). The next build picks them up.
+
+> **Your branding survives upstream pulls.** Repository Variables are stored in your fork's
+> GitHub settings, **not** in the code. Pulling/merging new changes from the upstream
+> repository only updates source files — it never touches your Variables, so your branding
+> keeps working with zero merge conflicts. Set them once and forget them. (The same is true
+> of a `public/brand-logo.png` you commit: upstream never ships a file at that path, so it
+> won't conflict.)
+
+| Variable                  | Effect                                                                    | Example                          |
+| ------------------------- | ------------------------------------------------------------------------- | -------------------------------- |
+| `VITE_BRAND_NAME`         | App name in the navbar, browser tab title, and About dialog               | `Contoso Optimizer`              |
+| `VITE_BRAND_VENDOR`       | Your "Distributed by …" line in the About dialog                          | `Contoso IT`                     |
+| `VITE_BRAND_URL`          | Your website link in the About dialog                                     | `https://contoso.example`        |
+| `VITE_BRAND_DESCRIPTION`  | The description paragraph in the About dialog                             | `Internal Windows tuning tool`   |
+| `VITE_BRAND_LOGO_VALUE`   | Logo as a URL, a `data:` URI, or raw base64 (see logo options below)      | `https://contoso.example/l.png`  |
+| `VITE_BRAND_ACCENT`       | Accent color as a hex value, applied across both themes                   | `#e11d48`                        |
+
+The same variable names are used everywhere — in your repository Variables, on the command
+line, and in `.env.local` — so there is only one name to remember per setting.
+
+### Logo options
+
+The logo is resolved in this order:
+
+1. **`VITE_BRAND_LOGO_VALUE`** repository Variable, if set. It accepts any of:
+   - an **http(s) URL** to a hosted image — `https://contoso.example/logo.png`
+   - a full **`data:` URI** — `data:image/png;base64,iVBORw0KGgo…`
+   - **raw base64** with no prefix — `iVBORw0KGgo…`. The image type (PNG, JPEG,
+     GIF, WebP, SVG) is auto-detected from the data's magic bytes and wrapped into
+     a `data:` URI for you. This is handy for fully self-contained builds with no
+     external image request.
+2. **Convention file** — commit your logo to `WorkspaceOptimizer/public/brand-logo.png`.
+   It is served at the site root and used automatically.
+3. **Bundled default** — the original Workspace Optimizer logo, used if none of the above is present.
+
+The logo is displayed at a fixed height with its width following the image's natural
+aspect ratio (capped so it never crowds the app title), so non-square logos render
+correctly. The convention file or an embedded base64 value is recommended for
+self-hosting since neither has an external dependency.
+
+### Attribution
+
+White-labeling changes the displayed product name, your vendor line, links, description,
+accent color, and logo. The original author credit — **John Billekens Consultancy & AppVentiX** —
+always remains visible in the About dialog, and a small "Powered by Workspace Optimizer"
+line appears when the app has been rebranded. Your own vendor line is shown **in addition
+to**, not instead of, the original credit. Please keep this attribution intact.
+
+### Local testing
+
+Branding is read at **build time** from the `VITE_BRAND_*` environment variables — the same
+names you use as repository Variables. There are two ways to set them locally.
+
+**Option A — `.env.local` file (recommended).** Create `WorkspaceOptimizer/.env.local`:
+
+```bash
+# WorkspaceOptimizer/.env.local   (git-ignored — never committed)
+VITE_BRAND_NAME=Contoso Optimizer
+VITE_BRAND_VENDOR=Contoso IT
+VITE_BRAND_ACCENT=#e11d48
+```
+
+Then run `npm run dev` or `npm run build` from `WorkspaceOptimizer/`.
+
+**Option B — command-line variables.** Set the variables in the shell **before** starting
+the dev server or build (Vite reads them when the process starts; setting them after the
+server is already running has no effect).
+
+PowerShell:
+
+```powershell
+cd WorkspaceOptimizer
+$env:VITE_BRAND_NAME   = "Contoso Optimizer"
+$env:VITE_BRAND_VENDOR = "Contoso IT"
+$env:VITE_BRAND_ACCENT = "#e11d48"
+npm run dev          # or: npm run build
+```
+
+Bash / macOS / Linux:
+
+```bash
+cd WorkspaceOptimizer
+VITE_BRAND_NAME="Contoso Optimizer" \
+VITE_BRAND_VENDOR="Contoso IT" \
+VITE_BRAND_ACCENT="#e11d48" \
+npm run dev          # or: npm run build
+```
+
+> The logo is **not** changed by `VITE_BRAND_NAME`/`VITE_BRAND_ACCENT` alone. To preview a
+> branded logo locally, also set `VITE_BRAND_LOGO_VALUE=...` (a URL, `data:` URI, or raw
+> base64) or drop a file at `WorkspaceOptimizer/public/brand-logo.png`.

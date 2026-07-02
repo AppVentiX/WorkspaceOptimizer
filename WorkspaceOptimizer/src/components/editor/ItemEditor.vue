@@ -1,7 +1,18 @@
 <template>
   <div v-if="!item" class="editor-empty">
-    <p>Click the <strong>"New from Default"</strong> button to start with a default template.</p>
-    <p>Click the <strong>"Open Template"</strong> button to open and change your own template.</p>
+    <p>
+      Click <strong>New from Default</strong> in the toolbar to start with a default template.
+    </p>
+    <p>
+      Click <strong>Open Template</strong> in the toolbar to open and edit your own template.
+    </p>
+    <p>
+      Click <strong>Download Script</strong> in the toolbar to get the PowerShell deployment script anytime.
+    </p>
+    <p class="ee-note">Once a template is loaded you can also:</p>
+    <p class="ee-disabled">
+      <strong>Download XML</strong> to save your configured template as an XML file.
+    </p>
   </div>
 
   <div v-else class="editor-layout">
@@ -10,7 +21,7 @@
       <span class="bc-cat">{{ item.category || '—' }}</span>
       <span class="bc-sep">›</span>
       <span class="bc-name">{{ item.name || '(unnamed)' }}</span>
-      <span class="bc-badge">{{ item.type }}</span>
+      <span class="bc-badge" :style="{ color: accentColor, borderColor: accentColor, background: accentColor + '1f' }">{{ item.type }}</span>
     </div>
 
     <!-- Scrollable editor column -->
@@ -21,18 +32,19 @@
           <!-- General card -->
           <div class="card" style="margin-bottom:12px">
             <div class="card-hdr">
-              <div class="c-accent" :style="{ background: accentColor }"></div>
+              <div class="c-accent" style="background:var(--item-bar)"></div>
               <span class="c-label">General</span>
             </div>
             <div class="card-body">
-              <div class="form-row">
-                <div style="flex:3">
+              <!-- Line 1: Name + Order (75% / 25%) -->
+              <div class="field-grid">
+                <div class="col-9">
                   <div class="field">
                     <label class="field-lbl">Name *</label>
                     <input class="field-inp" :value="item.name" @input="update('name', ($event.target as HTMLInputElement).value)" />
                   </div>
                 </div>
-                <div style="flex:1">
+                <div class="col-3">
                   <div class="field">
                     <label class="field-lbl">Order</label>
                     <input class="field-inp" type="number" min="0" max="99999" :value="item.order"
@@ -40,16 +52,18 @@
                   </div>
                 </div>
               </div>
-              <div class="form-row">
-                <div class="fg">
+              <!-- Line 2: Description (full width) -->
+              <div class="field-grid">
+                <div class="col-12">
                   <div class="field">
                     <label class="field-lbl">Description</label>
                     <textarea ref="descRef" class="field-inp field-ta" rows="1" :value="item.description" @input="onDescInput" />
                   </div>
                 </div>
               </div>
-              <div class="form-row">
-                <div class="fg">
+              <!-- Line 3: Type + Category -->
+              <div class="field-grid">
+                <div class="col-6">
                   <div class="field">
                     <label class="field-lbl">Type *</label>
                     <select class="field-inp" :value="item.type" @change="onTypeChange(($event.target as HTMLSelectElement).value as ItemType)">
@@ -57,7 +71,7 @@
                     </select>
                   </div>
                 </div>
-                <div class="fg">
+                <div class="col-6">
                   <div class="field">
                     <label class="field-lbl">Category *</label>
                     <div class="cat-row">
@@ -199,8 +213,15 @@ function onPayloadUpdate(patch: Partial<ItemPayload>) {
 </script>
 
 <style scoped>
-.editor-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; color: var(--bc-name); font-size: 13px; gap: 8px; }
-.editor-empty p { margin: 0; text-align: center; }
+.editor-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; color: var(--bc-name); font-size: 18px; gap: 14px; }
+.editor-empty p { margin: 0; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; line-height: 1.5; }
+.ee-icon { display: inline-flex; align-items: center; }
+.ee-icon svg { width: 1.1em; height: 1.1em; fill: none; stroke: var(--item-bar); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
+.ee-icon svg.icon-filled { fill: var(--item-bar); stroke: none; }
+.ee-disabled .ee-icon svg.icon-filled { fill: var(--field-label); }
+.ee-note { color: var(--field-label); margin-top: 6px; opacity: 0.85; }
+.ee-disabled { opacity: 0.45; }
+.ee-disabled .ee-icon svg { stroke: var(--field-label); }
 .editor-layout { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
 .bc-bar { display: flex; align-items: center; gap: 8px; padding: 9px 16px; background: var(--bc-bg); border-bottom: 1px solid var(--bc-border); flex-shrink: 0; }
 .bc-cat { font-size: 11px; color: var(--bc-cat); font-weight: 500; }

@@ -1,15 +1,18 @@
 <template>
   <div class="app-root">
-    <NavBar @new="onNew" @open="onOpen" @save="onSave" @manageos="showOsDialog = true" @pdf="onPdf" @about="showAboutDialog = true" @togglesidebar="shell?.toggleSidebar()" />
-    <AppShell ref="shell">
-      <template #sidebar><ItemList /></template>
-      <template #main>
-        <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0">
-          <ItemEditor style="flex:1;overflow:hidden;min-height:0" />
-          <ValidationBar />
-        </div>
-      </template>
-    </AppShell>
+    <div class="main-col">
+      <IconRail @new="onNew" @open="onOpen" @save="onSave" @downloadscript="onDownloadScript"
+        @manageos="showOsDialog = true" @pdf="onPdf" @about="showAboutDialog = true" />
+      <AppShell ref="shell">
+        <template #sidebar><ItemList /></template>
+        <template #main>
+          <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0">
+            <ItemEditor style="flex:1;overflow:hidden;min-height:0" />
+            <ValidationBar />
+          </div>
+        </template>
+      </AppShell>
+    </div>
     <input ref="fileInput" type="file" accept=".xml" style="display:none" @change="onFileSelected" />
     <OSDialog v-model:visible="showOsDialog" />
     <PdfDialog v-model:visible="showPdfDialog" />
@@ -19,7 +22,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import NavBar from './components/NavBar.vue'
+import IconRail from './components/IconRail.vue'
 import AppShell from './components/AppShell.vue'
 import ItemList from './components/sidebar/ItemList.vue'
 import ItemEditor from './components/editor/ItemEditor.vue'
@@ -78,6 +81,13 @@ function onSave() {
 }
 
 function onPdf() { showPdfDialog.value = true }
+
+function onDownloadScript() {
+  const a = document.createElement('a')
+  a.href = import.meta.env.BASE_URL + 'Invoke-WindowsOptimization.ps1'
+  a.download = 'Invoke-WindowsOptimization.ps1'
+  a.click()
+}
 
 onMounted(() => { window.addEventListener('beforeunload', e => { if (documentStore.dirty) e.preventDefault() }) })
 </script>
