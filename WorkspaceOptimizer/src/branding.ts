@@ -22,7 +22,7 @@ import defaultLogoUrl from './assets/WorkspaceOptimizer.png'
 const env = import.meta.env
 
 /** Permanent, non-overridable original author credit (always shown in About). */
-export const ORIGINAL_CREDIT = 'John Billekens Consultancy & AppVentiX'
+export const ORIGINAL_CREDIT = 'John Billekens Consultancy'
 
 function str(v: unknown): string | undefined {
   const s = typeof v === 'string' ? v.trim() : ''

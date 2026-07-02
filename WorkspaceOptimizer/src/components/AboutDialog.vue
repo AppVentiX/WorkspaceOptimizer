@@ -22,7 +22,6 @@
 
             <!-- Permanent original author credit — always shown, not configurable -->
             <div class="about-author">Created by <strong>{{ ORIGINAL_CREDIT }}</strong></div>
-            <a class="about-link" href="https://appventix.com" target="_blank" rel="noopener noreferrer">appventix.com ↗</a>
             <a class="about-link" href="https://blog.j81.nl" target="_blank" rel="noopener noreferrer">blog.j81.nl ↗</a>
 
             <div class="about-divider"></div>
